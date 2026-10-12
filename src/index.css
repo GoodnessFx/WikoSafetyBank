@@ -1897,16 +1897,21 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: 12px;
+    padding: 14px 16px;
   }
   .status-banner > span {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
   }
+  .status-banner-content {
+    width: 100%;
+  }
+  .status-banner .banner-action-btn,
   .status-banner > .button {
     width: 100%;
     margin-top: 4px;
+    justify-content: center;
   }
   .balance-card {
     min-height: auto;
@@ -1916,20 +1921,32 @@ html, body {
   }
   .balance-top {
     flex-direction: column;
+    align-items: flex-start;
     gap: 14px;
   }
+  .balance-top > div:first-child {
+    width: 100%;
+  }
   .balance-top > div:last-child {
+    width: 100%;
     align-items: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 8px;
   }
+  .currency-pill,
+  .client-limit-tag {
+    font-size: 10.5px;
+    white-space: normal;
+    text-align: center;
+  }
   .balance-line strong {
     font-size: 26px;
   }
   .balance-credentials-row {
-    font-size: 10px;
+    font-size: 10.5px;
     flex-wrap: wrap;
+    gap: 6px;
   }
   .balance-actions {
     position: static;
@@ -2053,20 +2070,25 @@ html, body {
     display: none;
   }
   .status-pill span {
-    font-size: 10.5px;
+    font-size: 10px;
   }
   main {
-    padding: 14px 10px 84px;
+    padding: 12px 10px 84px;
   }
   .panel {
-    padding: 16px 14px;
+    padding: 16px 12px;
     border-radius: 14px;
   }
   .balance-card {
-    padding: 16px 14px;
+    padding: 16px 12px;
   }
   .balance-line strong {
-    font-size: 24px;
+    font-size: 22px;
+  }
+  .currency-pill,
+  .client-limit-tag {
+    font-size: 9.5px;
+    padding: 4px 8px;
   }
   .amount-input-box {
     padding: 6px 10px;
@@ -2081,4 +2103,5 @@ html, body {
     text-align: center;
   }
 }
+
 

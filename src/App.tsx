@@ -809,7 +809,7 @@ function HomeView({
           <span>
             <ShieldCheck size={20} className="text-emerald-500" />
           </span>
-          <div>
+          <div className="status-banner-content">
             <strong>Verified Banking Client ({user.idDocumentType || "Passport"})</strong>
             <p>
               Assigned Account No: <strong>{user.accountNumber}</strong> &bull; Routing:{" "}
@@ -817,7 +817,7 @@ function HomeView({
               <strong>${user.withdrawalLimit.toFixed(2)} limit</strong>.
             </p>
           </div>
-          <Button variant="ghost" onClick={copyAccountDetails}>
+          <Button variant="secondary" className="banner-action-btn" onClick={copyAccountDetails}>
             <Copy size={15} /> Copy Credentials
           </Button>
         </div>
