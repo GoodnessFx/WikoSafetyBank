@@ -677,7 +677,6 @@ function Header({
   return (
     <header className="topbar">
       <div className="mobile-brand">
-        <Brand compact onAdminClick={onAdminClick} />
         <Brand onAdminClick={onAdminClick} />
       </div>
       <Button
@@ -686,7 +685,7 @@ function Header({
         onClick={onMenu}
         aria-label="Open menu"
       >
-        <Menu size={21} />
+        <Menu size={20} />
       </Button>
       <div className="topbar-actions">
         {/* Verification Status Pill */}

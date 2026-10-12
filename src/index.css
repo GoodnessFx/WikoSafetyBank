@@ -1784,82 +1784,188 @@ h2 {
   margin-top: 3px;
 }
 
-/* RESPONSIVE DESIGN */
+/* =========================================================================
+   COMPREHENSIVE RESPONSIVE DESIGN (CROSS-DEVICE: DESKTOP, LAPTOP, TABLET, MOBILE)
+   ========================================================================= */
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .balance-card {
+    min-height: auto;
+    padding-bottom: 90px;
+  }
+}
+
 @media (max-width: 1080px) {
   .dashboard-grid,
   .transfer-layout,
   .settings-grid,
   .admin-layout-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .admin-layout-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .cards-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   .sidebar {
-    display: none;
+    display: none !important;
   }
   .app-main {
-    margin-left: 0;
-    width: 100%;
-  }
-  .topbar {
-    height: 64px;
-    padding: 0 16px;
-    justify-content: space-between;
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
   }
   .mobile-brand {
-    display: flex;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
   }
   .menu-button {
-    display: inline-flex;
+    display: inline-flex !important;
+  }
+  .topbar {
+    height: 60px;
+    padding: 0 14px;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .topbar-actions {
+    gap: 6px;
   }
   .user-profile-badge {
     display: none;
   }
+  .status-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .limit-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
   main {
-    padding: 20px 16px 90px;
+    padding: 16px 14px 88px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
   .welcome-row {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .welcome-row h1 {
+    font-size: 22px;
+  }
+  .welcome-row p {
+    font-size: 12.5px;
+  }
+  .welcome-row > .flex {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .welcome-row > .flex > .button {
+    flex: 1 1 auto;
+    font-size: 12px;
+  }
+  .status-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .status-banner > span {
+    width: 32px;
+    height: 32px;
+  }
+  .status-banner > .button {
+    width: 100%;
+    margin-top: 4px;
   }
   .balance-card {
-    min-height: 290px;
-    padding: 20px;
+    min-height: auto;
+    padding: 20px 16px 20px;
+    position: relative;
+    border-radius: 16px;
+  }
+  .balance-top {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .balance-top > div:last-child {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .balance-line strong {
     font-size: 26px;
   }
+  .balance-credentials-row {
+    font-size: 10px;
+    flex-wrap: wrap;
+  }
   .balance-actions {
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
+    position: static;
+    margin-top: 18px;
+    display: flex;
     flex-direction: column;
+    gap: 8px;
+    width: 100%;
   }
   .balance-action {
     width: 100%;
-    min-height: 38px;
+    min-width: 0;
+    min-height: 42px;
+    justify-content: center;
   }
   .bottom-nav {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(5, 1fr);
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 68px;
+    height: 64px;
     background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     border-top: 1px solid var(--line);
-    z-index: 30;
-    padding: 4px;
+    z-index: 40;
+    padding: 2px 4px 6px;
+    box-sizing: border-box;
   }
   .bottom-item {
     flex-direction: column;
     padding: 0;
-    font-size: 9.5px;
-    gap: 3px;
-    min-height: 52px;
+    font-size: 9px;
+    gap: 2px;
+    min-height: 48px;
     border-radius: 8px;
     color: #64748b;
   }
@@ -1872,16 +1978,107 @@ h2 {
     position: fixed;
     inset: 0;
     background: white;
-    z-index: 90;
+    z-index: 95;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 20px;
+    padding: 20px 16px;
+    overflow-y: auto;
   }
   .sheet-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+  }
+  .transfer-rails {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .coordinates-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-actions-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-log-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .wallets-grid {
+    grid-template-columns: 1fr;
+  }
+  .bank-chips-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal {
+    width: 95% !important;
+    max-width: 95vw !important;
+    padding: 18px 16px !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .bank-card {
+    aspect-ratio: auto;
+    min-height: 200px;
+    padding: 18px 16px;
+  }
+  .card-foot {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .card-foot b {
+    grid-column: 1 / -1;
+    text-align: right;
   }
 }
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0 10px;
+  }
+  .brand {
+    font-size: 15px;
+    gap: 6px;
+  }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .limit-pill {
+    display: none;
+  }
+  .status-pill span {
+    font-size: 10.5px;
+  }
+  main {
+    padding: 14px 10px 84px;
+  }
+  .panel {
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+  .balance-card {
+    padding: 16px 14px;
+  }
+  .balance-line strong {
+    font-size: 24px;
+  }
+  .amount-input-box {
+    padding: 6px 10px;
+  }
+  .amount-input {
+    font-size: 18px;
+  }
+  .toast-banner {
+    width: 90%;
+    font-size: 11.5px;
+    padding: 8px 14px;
+    text-align: center;
+  }
+}
+
