@@ -50,6 +50,8 @@ import {
   AlertTriangle,
   UserCheck,
   Zap,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react"
 import {
   INITIAL_USER,
@@ -145,6 +147,10 @@ export default function App() {
     return localStorage.getItem("wiko_admin_auth") === "true"
   })
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem("wiko_sidebar_collapsed") === "true"
+  })
+
   const [view, setView] = useState<View>("home")
   const [modal, setModal] = useState<ModalType>(null)
   const [splash, setSplash] = useState(true)
@@ -172,6 +178,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("wiko_admin_auth", String(isAdminAuthenticated))
   }, [isAdminAuthenticated])
+
+  useEffect(() => {
+    localStorage.setItem("wiko_sidebar_collapsed", String(isSidebarCollapsed))
+  }, [isSidebarCollapsed])
 
   useEffect(() => {
     const timer = window.setTimeout(() => setSplash(false), 700)
@@ -228,7 +238,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isSidebarCollapsed ? "sidebar-is-collapsed" : ""}`}>
       {/* Toast Notification */}
       {toast && (
         <div className="toast-banner">
@@ -246,6 +256,8 @@ export default function App() {
         setView={setView}
         currentUser={currentUser}
         isAdmin={isAdminAuthenticated}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         onOpenAdmin={() => {
           if (isAdminAuthenticated) {
             setView("admin")
@@ -255,10 +267,12 @@ export default function App() {
         }}
       />
 
-      <div className="app-main">
+      <div className={`app-main ${isSidebarCollapsed ? "app-main-expanded" : ""}`}>
         <Header
           currentUser={currentUser}
           isAdmin={isAdminAuthenticated}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           onMenu={() => setMobileMenu(true)}
           onAdminClick={() => {
             if (isAdminAuthenticated) {
@@ -564,12 +578,16 @@ function Sidebar({
   setView,
   currentUser,
   isAdmin,
+  isCollapsed,
+  onToggleCollapse,
   onOpenAdmin,
 }: {
   view: View
   setView: (view: View) => void
   currentUser: UserProfile
   isAdmin: boolean
+  isCollapsed: boolean
+  onToggleCollapse: () => void
   onOpenAdmin: () => void
 }) {
   const mainNav: { id: View; label: string; icon: typeof Home }[] = [
@@ -581,81 +599,114 @@ function Sidebar({
   ]
 
   return (
-    <aside className="sidebar">
-      <Brand onAdminClick={onOpenAdmin} />
+    <aside className={`sidebar ${isCollapsed ? "sidebar-collapsed" : ""}`}>
+      <div className="sidebar-header">
+        <Brand compact={isCollapsed} onAdminClick={onOpenAdmin} />
+        <button
+          className="sidebar-collapse-btn"
+          onClick={onToggleCollapse}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+        </button>
+      </div>
+
       <nav className="side-nav" aria-label="Main navigation">
-        <span className="nav-label">CLIENT BANKING</span>
+        {!isCollapsed && <span className="nav-label">CLIENT BANKING</span>}
         {mainNav.map(({ id, label, icon: Icon }) => (
           <Button
             key={id}
             variant="ghost"
+            title={isCollapsed ? label : undefined}
             className={view === id ? "nav-item active" : "nav-item"}
             onClick={() => setView(id)}
           >
             <Icon size={19} />
-            <span>{label}</span>
+            {!isCollapsed && <span>{label}</span>}
           </Button>
         ))}
 
-        <span className="nav-label nav-label-spaced">SETTINGS & ASSISTANCE</span>
+        {!isCollapsed && <span className="nav-label nav-label-spaced">SETTINGS & ASSISTANCE</span>}
         <Button
           variant="ghost"
+          title={isCollapsed ? "Account Settings" : undefined}
           className={view === "settings" ? "nav-item active" : "nav-item"}
           onClick={() => setView("settings")}
         >
           <Settings size={19} />
-          <span>Account Settings</span>
+          {!isCollapsed && <span>Account Settings</span>}
         </Button>
         <Button
           variant="ghost"
+          title={isCollapsed ? "Support Desk" : undefined}
           className={view === "support" ? "nav-item active" : "nav-item"}
           onClick={() => setView("support")}
         >
           <Headphones size={19} />
-          <span>Support Desk</span>
+          {!isCollapsed && <span>Support Desk</span>}
         </Button>
 
-        <span className="nav-label nav-label-spaced">MANAGEMENT</span>
+        {!isCollapsed && <span className="nav-label nav-label-spaced">MANAGEMENT</span>}
         <Button
           variant="ghost"
+          title={isCollapsed ? (isAdmin ? "Admin Portal (Active)" : "Admin Login") : undefined}
           className={view === "admin" ? "nav-item active admin-nav-btn" : "nav-item admin-nav-btn"}
           onClick={onOpenAdmin}
         >
           <KeyRound size={19} className="text-amber-500" />
-          <span style={{ fontWeight: 650 }}>
-            {isAdmin ? "Admin Portal" : "Admin Login"}
-          </span>
-          {isAdmin && <span className="admin-badge">ACTIVE</span>}
+          {!isCollapsed && (
+            <>
+              <span style={{ fontWeight: 650 }}>
+                {isAdmin ? "Admin Portal" : "Admin Login"}
+              </span>
+              {isAdmin && <span className="admin-badge">ACTIVE</span>}
+            </>
+          )}
         </Button>
       </nav>
 
       {/* Account number chip card */}
-      <div className="sidebar-card">
-        <span className="sidebar-card-icon">
-          <Building2 size={20} />
-        </span>
-        <div>
-          <strong className="truncate">Acct: {currentUser.accountNumber}</strong>
-          <p>Routing: {currentUser.routingNumber}</p>
+      {!isCollapsed ? (
+        <div className="sidebar-card">
+          <span className="sidebar-card-icon">
+            <Building2 size={20} />
+          </span>
+          <div>
+            <strong className="truncate">Acct: {currentUser.accountNumber}</strong>
+            <p>Routing: {currentUser.routingNumber}</p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="sidebar-card-compact" title={`Acct: ${currentUser.accountNumber}`}>
+          <Building2 size={18} className="text-blue-500" />
+        </div>
+      )}
 
       {/* Profile snippet */}
-      <div className="profile-mini" onClick={() => setView("settings")} style={{ cursor: "pointer" }}>
+      <div
+        className={`profile-mini ${isCollapsed ? "profile-mini-compact" : ""}`}
+        onClick={() => setView("settings")}
+        style={{ cursor: "pointer" }}
+        title={isCollapsed ? currentUser.name : undefined}
+      >
         <span className="avatar">{currentUser.avatar}</span>
-        <div style={{ minWidth: 0 }}>
-          <strong className="truncate">{currentUser.name}</strong>
-          <span className="flex items-center gap-1">
-            {currentUser.isVerified ? (
-              <span className="verified-tag">
-                <Check size={10} /> Verified
+        {!isCollapsed && (
+          <>
+            <div style={{ minWidth: 0 }}>
+              <strong className="truncate">{currentUser.name}</strong>
+              <span className="flex items-center gap-1">
+                {currentUser.isVerified ? (
+                  <span className="verified-tag">
+                    <Check size={10} /> Verified
+                  </span>
+                ) : (
+                  <span className="unverified-tag">Unverified</span>
+                )}
               </span>
-            ) : (
-              <span className="unverified-tag">Unverified</span>
-            )}
-          </span>
-        </div>
-        <MoreHorizontal size={18} />
+            </div>
+            <MoreHorizontal size={18} />
+          </>
+        )}
       </div>
     </aside>
   )
@@ -664,29 +715,43 @@ function Sidebar({
 function Header({
   currentUser,
   isAdmin,
+  isSidebarCollapsed,
+  onToggleSidebar,
   onMenu,
   onAdminClick,
   onVerificationClick,
 }: {
   currentUser: UserProfile
   isAdmin: boolean
+  isSidebarCollapsed: boolean
+  onToggleSidebar: () => void
   onMenu: () => void
   onAdminClick: () => void
   onVerificationClick: () => void
 }) {
   return (
     <header className="topbar">
-      <div className="mobile-brand">
-        <Brand onAdminClick={onAdminClick} />
+      <div className="topbar-left">
+        <button
+          className="desktop-sidebar-toggle"
+          onClick={onToggleSidebar}
+          title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isSidebarCollapsed ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}
+        </button>
+        <div className="mobile-brand">
+          <Brand onAdminClick={onAdminClick} />
+        </div>
+        <Button
+          variant="icon"
+          className="menu-button"
+          onClick={onMenu}
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </Button>
       </div>
-      <Button
-        variant="icon"
-        className="menu-button"
-        onClick={onMenu}
-        aria-label="Open menu"
-      >
-        <Menu size={20} />
-      </Button>
+
       <div className="topbar-actions">
         {/* Verification Status Pill */}
         <button
@@ -2663,12 +2728,42 @@ function DepositModal({
   close: () => void
   onDeposit: (amount: number, method: string) => void
 }) {
+  const [activeTab, setActiveTab] = useState<"wire" | "card" | "instant">("card")
   const [amount, setAmount] = useState("500")
-  const [method, setMethod] = useState("Fedwire Inbound Wire")
+  const [cardNumber, setCardNumber] = useState("")
+  const [cardExpiry, setCardExpiry] = useState("")
+  const [cardCvv, setCardCvv] = useState("")
+  const [cardHolder, setCardHolder] = useState(user.name)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedField(field)
+    setTimeout(() => setCopiedField(null), 2000)
+  }
+
+  const handleDepositSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const num = parseFloat(amount)
+    if (!num || num <= 0) return
+
+    setIsProcessing(true)
+    setTimeout(() => {
+      setIsProcessing(false)
+      const method =
+        activeTab === "card"
+          ? `Debit Card (•••• ${cardNumber.slice(-4) || "8920"})`
+          : activeTab === "wire"
+          ? "Bank Wire Transfer"
+          : "Instant Federal Inbound"
+      onDeposit(num, method)
+    }, 900)
+  }
 
   return (
     <div className="modal-backdrop" onMouseDown={close}>
-      <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
+      <div className="modal deposit-modal-clean" onMouseDown={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div className="modal-icon">
             <ArrowDownLeft size={22} />
@@ -2677,57 +2772,247 @@ function DepositModal({
             <X size={18} />
           </Button>
         </div>
-        <h2>Deposit Funds to Account</h2>
-        <p>Deposit funds directly to your checking account <strong>{user.accountNumber}</strong>.</p>
+        <h2>Add Real Money to Account</h2>
+        <p className="text-muted text-xs">
+          Deposit funds to checking account <strong>{user.accountNumber}</strong> &bull; Wiko Safety Bank N.A.
+        </p>
 
-        <div className="form-group my-3">
-          <label>DEPOSIT METHOD</label>
-          <select
-            value={method}
-            onChange={(e) => setMethod(e.target.value)}
-            className="input-select"
+        {/* Tab selection */}
+        <div className="deposit-tabs-row my-4">
+          <button
+            type="button"
+            className={`deposit-tab-btn ${activeTab === "card" ? "active" : ""}`}
+            onClick={() => setActiveTab("card")}
           >
-            <option value="Fedwire Inbound Wire">Instant Fedwire Inbound</option>
-            <option value="ACH Direct Deposit">ACH Payroll / Settlement</option>
-            <option value="Debit Card Top Up">Debit Card Instant Top-Up</option>
-            <option value="Treasury Check">Treasury Check Deposit</option>
-          </select>
+            <CreditCard size={15} />
+            <span>Debit / Credit Card</span>
+          </button>
+          <button
+            type="button"
+            className={`deposit-tab-btn ${activeTab === "wire" ? "active" : ""}`}
+            onClick={() => setActiveTab("wire")}
+          >
+            <Landmark size={15} />
+            <span>Bank Wire / ACH</span>
+          </button>
+          <button
+            type="button"
+            className={`deposit-tab-btn ${activeTab === "instant" ? "active" : ""}`}
+            onClick={() => setActiveTab("instant")}
+          >
+            <Zap size={15} />
+            <span>Instant Top-Up</span>
+          </button>
         </div>
 
-        <div className="form-group mb-4">
-          <label>AMOUNT (USD)</label>
-          <div className="amount-input-box">
-            <span className="currency-symbol">$</span>
-            <input
-              type="number"
-              step="10"
-              min="1"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="amount-input"
-            />
+        {activeTab === "card" && (
+          <form onSubmit={handleDepositSubmit}>
+            <div className="form-group mb-3">
+              <div className="flex justify-between items-center mb-1">
+                <label>AMOUNT TO DEPOSIT (USD)</label>
+                <div className="flex gap-1">
+                  {["100", "250", "500", "1000"].map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      className="chip-btn"
+                      onClick={() => setAmount(v)}
+                    >
+                      ${v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="amount-input-box">
+                <span className="currency-symbol">$</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="5"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="amount-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group mb-3">
+              <label>CARD NUMBER</label>
+              <input
+                type="text"
+                placeholder="4532 •••• •••• 9281"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)}
+                className="input-text"
+                required
+              />
+            </div>
+
+            <div className="form-row flex gap-3 mb-3">
+              <div className="form-group flex-1">
+                <label>EXPIRY (MM/YY)</label>
+                <input
+                  type="text"
+                  placeholder="08/29"
+                  value={cardExpiry}
+                  onChange={(e) => setCardExpiry(e.target.value)}
+                  className="input-text"
+                  required
+                />
+              </div>
+              <div className="form-group flex-1">
+                <label>CVV / CVC</label>
+                <input
+                  type="password"
+                  maxLength={4}
+                  placeholder="•••"
+                  value={cardCvv}
+                  onChange={(e) => setCardCvv(e.target.value)}
+                  className="input-text"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group mb-4">
+              <label>CARDHOLDER NAME</label>
+              <input
+                type="text"
+                value={cardHolder}
+                onChange={(e) => setCardHolder(e.target.value)}
+                className="input-text"
+                required
+              />
+            </div>
+
+            <Button type="submit" className="full" disabled={isProcessing}>
+              {isProcessing ? (
+                <>
+                  <RefreshCw size={16} className="animate-spin" />
+                  <span>Processing Card Authorization...</span>
+                </>
+              ) : (
+                <>
+                  <LockKeyhole size={16} />
+                  <span>Deposit ${amount} Instantly</span>
+                </>
+              )}
+            </Button>
+          </form>
+        )}
+
+        {activeTab === "wire" && (
+          <div className="wire-instructions-box">
+            <p className="text-xs text-muted mb-3">
+              Transfer funds from your external bank (Chase, BofA, Wells Fargo, etc.) to your account using the Federal Reserve routing wire details below:
+            </p>
+            <div className="wire-fields-list">
+              <div className="wire-field-item">
+                <div>
+                  <small>BENEFICIARY BANK</small>
+                  <strong>{user.bankName}</strong>
+                </div>
+                <button
+                  type="button"
+                  className="copy-mini-btn"
+                  onClick={() => copyToClipboard(user.bankName, "bank")}
+                >
+                  {copiedField === "bank" ? <Check size={13} /> : <Copy size={13} />}
+                </button>
+              </div>
+
+              <div className="wire-field-item">
+                <div>
+                  <small>ROUTING NUMBER (ABA)</small>
+                  <strong className="font-mono text-blue-600">{user.routingNumber}</strong>
+                </div>
+                <button
+                  type="button"
+                  className="copy-mini-btn"
+                  onClick={() => copyToClipboard(user.routingNumber, "routing")}
+                >
+                  {copiedField === "routing" ? <Check size={13} /> : <Copy size={13} />}
+                </button>
+              </div>
+
+              <div className="wire-field-item">
+                <div>
+                  <small>ACCOUNT NUMBER</small>
+                  <strong className="font-mono text-blue-600">{user.accountNumber}</strong>
+                </div>
+                <button
+                  type="button"
+                  className="copy-mini-btn"
+                  onClick={() => copyToClipboard(user.accountNumber, "acct")}
+                >
+                  {copiedField === "acct" ? <Check size={13} /> : <Copy size={13} />}
+                </button>
+              </div>
+
+              <div className="wire-field-item">
+                <div>
+                  <small>ACCOUNT NAME</small>
+                  <strong>{user.name}</strong>
+                </div>
+                <button
+                  type="button"
+                  className="copy-mini-btn"
+                  onClick={() => copyToClipboard(user.name, "name")}
+                >
+                  {copiedField === "name" ? <Check size={13} /> : <Copy size={13} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-line flex gap-2">
+              <Button
+                className="full"
+                onClick={() => {
+                  const num = parseFloat(amount) || 1000
+                  onDeposit(num, "Direct Bank Wire Settlement")
+                }}
+              >
+                <Check size={16} /> Confirm Inbound Wire (${amount || "1,000"})
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="secure-note">
-          <ShieldCheck size={18} />
-          <span>
-            <strong>FDIC &amp; Federal Clearinghouse Verified</strong>
-            Deposits clear immediately onto your balance ledger.
-          </span>
-        </div>
+        {activeTab === "instant" && (
+          <form onSubmit={handleDepositSubmit}>
+            <div className="form-group mb-4">
+              <label>INSTANT TOP-UP AMOUNT (USD)</label>
+              <div className="amount-input-box">
+                <span className="currency-symbol">$</span>
+                <input
+                  type="number"
+                  step="10"
+                  min="1"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="amount-input"
+                  required
+                />
+              </div>
+            </div>
 
-        <Button
-          className="full"
-          onClick={() => {
-            const num = parseFloat(amount)
-            if (num > 0) onDeposit(num, method)
-          }}
-        >
-          Confirm &amp; Deposit ${amount} USD
-        </Button>
-        <Button variant="ghost" className="full" onClick={close}>
-          Cancel
+            <div className="secure-note mb-4">
+              <ShieldCheck size={18} />
+              <span>
+                <strong>Instant Treasury Clearinghouse</strong>
+                Funds are immediately verified and credited to your available balance.
+              </span>
+            </div>
+
+            <Button type="submit" className="full">
+              Confirm &amp; Deposit ${amount} USD
+            </Button>
+          </form>
+        )}
+
+        <Button variant="ghost" className="full mt-2" onClick={close}>
+          Close
         </Button>
       </div>
     </div>
