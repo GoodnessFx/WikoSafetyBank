@@ -1,0 +1,10 @@
+{
+  "description": "Experience seamless banking with a fully responsive digital bank app offering secure accounts, real-time transactions, and comprehensive financial management tools.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
