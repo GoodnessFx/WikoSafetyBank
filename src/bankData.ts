@@ -47,6 +47,17 @@ export interface BankCard {
   dailyLimit: number
 }
 
+export interface CardOrder {
+  id: string
+  trackingNumber: string
+  fullName: string
+  address: string
+  phone: string
+  method: string
+  timestamp: string
+  status: string
+}
+
 export const INITIAL_USER: UserProfile = {
   id: "usr_wik_0982",
   name: "Alexander Vance",

@@ -52,6 +52,10 @@ import {
   Zap,
   PanelLeftClose,
   PanelLeftOpen,
+  Truck,
+  Package,
+  Globe,
+  Phone,
 } from "lucide-react"
 import {
   INITIAL_USER,
@@ -63,10 +67,11 @@ import {
   type UserProfile,
   type Transaction,
   type BankCard,
+  type CardOrder,
 } from "./bankData"
 
 type View = "home" | "transfer" | "wallet" | "cards" | "activity" | "settings" | "support" | "admin"
-type ModalType = "deposit" | "withdraw" | "transfer" | "verify" | "adminLogin" | "receipt" | null
+type ModalType = "deposit" | "withdraw" | "transfer" | "verify" | "adminLogin" | "receipt" | "requestCard" | null
 
 function Button({
   children,
@@ -147,6 +152,12 @@ export default function App() {
     return localStorage.getItem("wiko_admin_auth") === "true"
   })
 
+  // New state for physical card orders
+  const [cardOrders, setCardOrders] = useState<CardOrder[]>(() => {
+    const saved = localStorage.getItem("wiko_card_orders")
+    return saved ? JSON.parse(saved) : []
+  })
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return localStorage.getItem("wiko_sidebar_collapsed") === "true"
   })
@@ -174,6 +185,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("wiko_cards", JSON.stringify(cards))
   }, [cards])
+
+  useEffect(() => {
+    localStorage.setItem("wiko_card_orders", JSON.stringify(cardOrders))
+  }, [cardOrders])
 
   useEffect(() => {
     localStorage.setItem("wiko_admin_auth", String(isAdminAuthenticated))
@@ -566,6 +581,52 @@ export default function App() {
       {modal === "receipt" && selectedTx && (
         <ReceiptModal tx={selectedTx} close={() => setModal(null)} />
       )}
+
+      {/* Request Card Modal */}
+      {modal === "requestCard" && (
+        <div className="modal-backdrop" onMouseDown={() => setModal(null)}>
+          <div className="modal" onMouseDown={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <div className="modal-icon text-amber-500"><Truck size={22} /></div>
+              <Button variant="icon" onClick={() => setModal(null)}><X size={18} /></Button>
+            </div>
+            <h2>Order Physical Card</h2>
+            <p>Enter delivery details. You will be redirected to our shipping partner.</p>
+            <form className="mt-4" onSubmit={e => {
+              e.preventDefault();
+              const form = e.currentTarget as any;
+              const newOrder: CardOrder = {
+                id: "ord_" + Date.now(),
+                trackingNumber: "TBD",
+                fullName: form.fullName.value,
+                address: form.address.value,
+                phone: form.phone.value,
+                method: "Standard",
+                timestamp: new Date().toISOString(),
+                status: "Ordered",
+              };
+              setCardOrders(prev => [...prev, newOrder]);
+              setModal(null);
+              showToast("Card order placed! Redirecting to shipping...");
+              window.open("https://wikoshipping.com", "_blank");
+            }}>
+              <div className="form-group mb-3">
+                <label>Full Name</label>
+                <input name="fullName" type="text" required className="input-text" />
+              </div>
+              <div className="form-group mb-3">
+                <label>Address</label>
+                <input name="address" type="text" required className="input-text" />
+              </div>
+              <div className="form-group mb-3">
+                <label>Phone Number</label>
+                <input name="phone" type="text" required className="input-text" />
+              </div>
+              <Button type="submit" className="full">Submit Order</Button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -647,23 +708,7 @@ function Sidebar({
           {!isCollapsed && <span>Support Desk</span>}
         </Button>
 
-        {!isCollapsed && <span className="nav-label nav-label-spaced">MANAGEMENT</span>}
-        <Button
-          variant="ghost"
-          title={isCollapsed ? (isAdmin ? "Admin Portal (Active)" : "Admin Login") : undefined}
-          className={view === "admin" ? "nav-item active admin-nav-btn" : "nav-item admin-nav-btn"}
-          onClick={onOpenAdmin}
-        >
-          <KeyRound size={19} className="text-amber-500" />
-          {!isCollapsed && (
-            <>
-              <span style={{ fontWeight: 650 }}>
-                {isAdmin ? "Admin Portal" : "Admin Login"}
-              </span>
-              {isAdmin && <span className="admin-badge">ACTIVE</span>}
-            </>
-          )}
-        </Button>
+
       </nav>
 
       {/* Sidebar footer: account chip + profile row */}
@@ -765,14 +810,7 @@ function Header({
         </div>
 
         {/* Hidden Admin Quick Key */}
-        <Button
-          variant="icon"
-          onClick={onAdminClick}
-          title={isAdmin ? "Admin Portal (Active)" : "Hidden Admin Feature (Password: WikoAdmin2026!)"}
-          style={isAdmin ? { borderColor: "#0b70df", color: "#0b70df" } : {}}
-        >
-          <KeyRound size={18} />
-        </Button>
+
 
         <div className="user-profile-badge">
           <span className="top-avatar">{currentUser.avatar}</span>
@@ -1560,11 +1598,13 @@ function CardsView({
   user,
   onToggleFreeze,
   showToast,
+  setModal,
 }: {
   cards: BankCard[]
   user: UserProfile
   onToggleFreeze: (id: string) => void
   showToast?: (m: string) => void
+  setModal: (v: ModalType) => void
 }) {
   const [showDetails, setShowDetails] = useState(false)
   const card = cards[0]
@@ -1652,6 +1692,10 @@ function CardsView({
             </small>
           </div>
         </Panel>
+        {/* Request Physical Card Button */}
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <Button variant="primary" onClick={() => setModal("requestCard")}>Order Physical Card</Button>
+        </div>
       </div>
     </div>
   )
@@ -3215,11 +3259,6 @@ function AdminLoginModal({
         <h2>Hidden Admin Authentication</h2>
         <p>Enter the master administrator authorization password to unlock the backend bank console.</p>
 
-        {/* Master Password Hint for User */}
-        <div className="admin-pass-hint">
-          <span>Master Admin Password:</span>
-          <code>{ADMIN_MASTER_PASSWORD}</code>
-        </div>
 
         <form onSubmit={handleSubmit} className="mt-4">
           <div className="form-group mb-4">

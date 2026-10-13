@@ -2478,3 +2478,221 @@ main {
     flex-direction: column;
   }
 }
+
+/* =================================================================
+   DISCREET ADMIN CONTROLS & SSL FOOTER
+   ================================================================= */
+.sidebar-security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.sidebar-security-badge .security-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.discreet-lock-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.discreet-lock-btn:hover {
+  color: var(--navy);
+  background: var(--surface-soft);
+}
+
+/* =================================================================
+   HOME VIEW - PHYSICAL CARD PROMO BANNER
+   ================================================================= */
+.physical-card-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #031e42 0%, #073b75 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  box-shadow: 0 4px 16px rgba(3, 30, 66, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.physical-card-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #93c5fd;
+}
+.physical-card-banner-info {
+  flex: 1;
+  min-width: 0;
+}
+.physical-card-banner-info strong {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: white;
+  margin-bottom: 2px;
+}
+.physical-card-banner-info p {
+  font-size: 12.5px;
+  color: #bfdbfe;
+  margin: 0;
+  line-height: 1.45;
+}
+@media (max-width: 640px) {
+  .physical-card-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .physical-card-banner .banner-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* =================================================================
+   CARDS VIEW - PHYSICAL CARD SHOWCASE
+   ================================================================= */
+.physical-card-section {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+.physical-card-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 880px) {
+  .physical-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.physical-card-img-wrap {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(3, 30, 66, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #021a3a;
+  aspect-ratio: 1.586;
+}
+.physical-card-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+.card-side-toggle-pills {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+.card-side-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.card-side-pill.active {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+}
+.physical-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+.physical-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-body);
+}
+.physical-spec-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #0b70df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.orders-tracker-card {
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  background: var(--surface-soft);
+}
+.orders-tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.order-tracking-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #a7f3d0;
+}
+.tracking-code-pill {
+  font-family: var(--font-mono);
+  font-weight: 650;
+  font-size: 12.5px;
+  color: var(--navy);
+  background: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+.shipping-partner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0b70df;
+}
+
