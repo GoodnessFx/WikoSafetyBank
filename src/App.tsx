@@ -338,7 +338,7 @@ export default function App() {
                   amount: data.amount,
                   currency: "USD",
                   title: `Transfer to ${data.bankName}`,
-                  description: `Outbound wire transfer to ${data.recipientName} (Acct ••${data.accountNumber.slice(-4)})`,
+                  description: `Outbound wire transfer to ${data.recipientName} (Acct â€¢â€¢${data.accountNumber.slice(-4)})`,
                   recipientBank: data.bankName,
                   recipientAccount: data.accountNumber,
                   recipientName: data.recipientName,
@@ -504,7 +504,7 @@ export default function App() {
               amount,
               currency: "USD",
               title: `Deposit via ${method}`,
-              description: `Funds verified and settled to USD Checking Account ending in ••${currentUser.accountNumber.slice(-4)}`,
+              description: `Funds verified and settled to USD Checking Account ending in â€¢â€¢${currentUser.accountNumber.slice(-4)}`,
               status: "completed",
             })
             setModal(null)
@@ -650,9 +650,8 @@ export default function App() {
           </div>
         </div>
       )}
-     )}
-
-
+    </div>
+  )
 }
 
 /* =========================================================================
@@ -948,7 +947,7 @@ function HomeView({
                 <div className="balance-line">
                   <strong>
                     {balanceHidden
-                      ? "$••••••"
+                      ? "$â€¢â€¢â€¢â€¢â€¢â€¢"
                       : `$${user.balanceUSD.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -1060,7 +1059,7 @@ function HomeView({
             </div>
             <div className="currency-list">
               <div className="currency-item">
-                <div className="currency-flag">🇺🇸</div>
+                <div className="currency-flag">ðŸ‡ºðŸ‡¸</div>
                 <div className="currency-info">
                   <strong>USD</strong>
                   <small>US Dollar</small>
@@ -1070,33 +1069,33 @@ function HomeView({
                 </div>
               </div>
               <div className="currency-item">
-                <div className="currency-flag">🇪🇺</div>
+                <div className="currency-flag">ðŸ‡ªðŸ‡º</div>
                 <div className="currency-info">
                   <strong>EUR</strong>
-                  <small>Euro · SEPA</small>
+                  <small>Euro Â· SEPA</small>
                 </div>
                 <div className="currency-amount">
-                  €{user.balanceEUR.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  â‚¬{user.balanceEUR.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </div>
               </div>
               <div className="currency-item">
-                <div className="currency-flag">🇬🇧</div>
+                <div className="currency-flag">ðŸ‡¬ðŸ‡§</div>
                 <div className="currency-info">
                   <strong>GBP</strong>
                   <small>British Pound</small>
                 </div>
                 <div className="currency-amount">
-                  £{user.balanceGBP.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  Â£{user.balanceGBP.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </div>
               </div>
               <div className="currency-item">
-                <div className="currency-flag">🇳🇬</div>
+                <div className="currency-flag">ðŸ‡³ðŸ‡¬</div>
                 <div className="currency-info">
                   <strong>NGN</strong>
                   <small>Nigerian Naira</small>
                 </div>
                 <div className="currency-amount">
-                  ₦{user.balanceNGN.toLocaleString("en-US", { minimumFractionDigits: 0 })}
+                  â‚¦{user.balanceNGN.toLocaleString("en-US", { minimumFractionDigits: 0 })}
                 </div>
               </div>
             </div>
@@ -1438,7 +1437,7 @@ function TransferView({
             <h3>Transfer Summary</h3>
             <div className="summary-row">
               <span>Origin Account</span>
-              <strong>••{user.accountNumber.slice(-4)} (USD)</strong>
+              <strong>â€¢â€¢{user.accountNumber.slice(-4)} (USD)</strong>
             </div>
             <div className="summary-row">
               <span>Destination Bank</span>
@@ -1446,11 +1445,11 @@ function TransferView({
             </div>
             <div className="summary-row">
               <span>Recipient Name</span>
-              <strong>{recipientName || "—"}</strong>
+              <strong>{recipientName || "â€”"}</strong>
             </div>
             <div className="summary-row">
               <span>Target Routing</span>
-              <strong>{routingNumber || "—"}</strong>
+              <strong>{routingNumber || "â€”"}</strong>
             </div>
             <div className="summary-row">
               <span>Transfer Fee</span>
@@ -1513,37 +1512,37 @@ function WalletView({
       balance: user.balanceUSD,
       routing: user.routingNumber,
       account: user.accountNumber,
-      flag: "🇺🇸",
+      flag: "ðŸ‡ºðŸ‡¸",
       color: "#0b70df",
     },
     {
       code: "EUR",
       name: "European Union Euro",
-      symbol: "€",
+      symbol: "â‚¬",
       balance: user.balanceEUR,
       routing: "WIKODEFFXXX",
       account: `DE893704004405${user.accountNumber.slice(-6)}`,
-      flag: "🇪🇺",
+      flag: "ðŸ‡ªðŸ‡º",
       color: "#10b981",
     },
     {
       code: "GBP",
       name: "Great Britain Pound",
-      symbol: "£",
+      symbol: "Â£",
       balance: user.balanceGBP,
       routing: "20-00-00",
       account: `GB29WIKO${user.accountNumber.slice(-8)}`,
-      flag: "🇬🇧",
+      flag: "ðŸ‡¬ðŸ‡§",
       color: "#8b5cf6",
     },
     {
       code: "NGN",
       name: "Nigerian Naira",
-      symbol: "₦",
+      symbol: "â‚¦",
       balance: user.balanceNGN,
       routing: "058152062",
       account: user.accountNumber,
-      flag: "🇳🇬",
+      flag: "ðŸ‡³ðŸ‡¬",
       color: "#f59e0b",
     },
   ]
@@ -1850,7 +1849,7 @@ function ActivityView({
                     <td>
                       <strong>{tx.title}</strong>
                       <span className="block text-xs text-muted">
-                        {tx.recipientBank ? `${tx.recipientBank} • ` : ""}
+                        {tx.recipientBank ? `${tx.recipientBank} â€¢ ` : ""}
                         {tx.description}
                       </span>
                     </td>
@@ -2637,7 +2636,7 @@ function BankCardComponent({
       <div className="masked-pan">
         {showDetails
           ? card.cardNumber
-          : `•••• •••• •••• ${card.cardNumber.slice(-4)}`}
+          : `â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ ${card.cardNumber.slice(-4)}`}
       </div>
       <div className="card-foot">
         <div>
@@ -2650,7 +2649,7 @@ function BankCardComponent({
         </div>
         <div>
           <span>CVV</span>
-          <strong>{showDetails ? card.cvv : "•••"}</strong>
+          <strong>{showDetails ? card.cvv : "â€¢â€¢â€¢"}</strong>
         </div>
         <b>VISA</b>
       </div>
@@ -2789,7 +2788,7 @@ function DepositModal({
       setIsProcessing(false)
       const method =
         activeTab === "card"
-          ? `Debit Card (•••• ${cardNumber.slice(-4) || "8920"})`
+          ? `Debit Card (â€¢â€¢â€¢â€¢ ${cardNumber.slice(-4) || "8920"})`
           : activeTab === "wire"
           ? "Bank Wire Transfer"
           : "Instant Federal Inbound"
@@ -2877,7 +2876,7 @@ function DepositModal({
               <label>Card Number</label>
               <input
                 type="text"
-                placeholder="4532 •••• •••• 9281"
+                placeholder="4532 â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ 9281"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value)}
                 className="input-text font-mono"
@@ -2902,7 +2901,7 @@ function DepositModal({
                 <input
                   type="password"
                   maxLength={4}
-                  placeholder="•••"
+                  placeholder="â€¢â€¢â€¢"
                   value={cardCvv}
                   onChange={(e) => setCardCvv(e.target.value)}
                   className="input-text font-mono"
@@ -3082,7 +3081,7 @@ function WithdrawModal({
           </Button>
         </div>
         <h2>Withdraw Funds ($50 Client Limit)</h2>
-        <p>Withdrawal from checking account ••{user.accountNumber.slice(-4)}.</p>
+        <p>Withdrawal from checking account â€¢â€¢{user.accountNumber.slice(-4)}.</p>
 
         {/* $50 Limit Highlight */}
         <div className={`p-3 rounded-lg border text-xs my-3 ${isExceeded ? "bg-rose-50 border-rose-200 text-rose-700" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
@@ -3371,7 +3370,7 @@ function ReceiptModal({
           {tx.recipientAccount && (
             <div className="receipt-row">
               <span>Recipient Account</span>
-              <strong>••••{tx.recipientAccount.slice(-4)}</strong>
+              <strong>â€¢â€¢â€¢â€¢{tx.recipientAccount.slice(-4)}</strong>
             </div>
           )}
           {tx.recipientName && (
