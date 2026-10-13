@@ -299,6 +299,7 @@ export default function App() {
           {view === "transfer" && (
             <TransferView
               user={currentUser}
+              showToast={showToast}
               onTransfer={(data) => {
                 // Check $50 limit
                 if (data.amount > currentUser.withdrawalLimit) {
@@ -350,6 +351,7 @@ export default function App() {
             <CardsView
               cards={cards}
               user={currentUser}
+              showToast={showToast}
               onToggleFreeze={(id) => {
                 setCards((prev) =>
                   prev.map((c) => (c.id === id ? { ...c, isFrozen: !c.isFrozen } : c))
@@ -362,6 +364,7 @@ export default function App() {
           {view === "activity" && (
             <ActivityView
               transactions={transactions.filter((t) => t.userId === currentUser.id)}
+              showToast={showToast}
               onSelectTx={(tx) => {
                 setSelectedTx(tx)
                 setModal("receipt")
@@ -665,48 +668,44 @@ function Sidebar({
         </Button>
       </nav>
 
-      {/* Account number chip card */}
-      {!isCollapsed ? (
-        <div className="sidebar-card">
-          <span className="sidebar-card-icon">
-            <Building2 size={20} />
+      {/* Sidebar footer: account chip + profile row */}
+      <div className="sidebar-footer">
+        {/* Account chip */}
+        <div
+          className="sidebar-account-chip"
+          title={isCollapsed ? `Acct: ${currentUser.accountNumber}` : undefined}
+        >
+          <span className="sidebar-account-chip-icon">
+            <Building2 size={17} />
           </span>
-          <div>
-            <strong className="truncate">Acct: {currentUser.accountNumber}</strong>
-            <p>Routing: {currentUser.routingNumber}</p>
-          </div>
-        </div>
-      ) : (
-        <div className="sidebar-card-compact" title={`Acct: ${currentUser.accountNumber}`}>
-          <Building2 size={18} className="text-blue-500" />
-        </div>
-      )}
-
-      {/* Profile snippet */}
-      <div
-        className={`profile-mini ${isCollapsed ? "profile-mini-compact" : ""}`}
-        onClick={() => setView("settings")}
-        style={{ cursor: "pointer" }}
-        title={isCollapsed ? currentUser.name : undefined}
-      >
-        <span className="avatar">{currentUser.avatar}</span>
-        {!isCollapsed && (
-          <>
-            <div style={{ minWidth: 0 }}>
-              <strong className="truncate">{currentUser.name}</strong>
-              <span className="flex items-center gap-1">
-                {currentUser.isVerified ? (
-                  <span className="verified-tag">
-                    <Check size={10} /> Verified
-                  </span>
-                ) : (
-                  <span className="unverified-tag">Unverified</span>
-                )}
-              </span>
+          {!isCollapsed && (
+            <div className="sidebar-account-chip-text">
+              <strong>Acct: {currentUser.accountNumber}</strong>
+              <p>Routing: {currentUser.routingNumber}</p>
             </div>
-            <MoreHorizontal size={18} />
-          </>
-        )}
+          )}
+        </div>
+
+        {/* Profile row */}
+        <div
+          className={`profile-row ${isCollapsed ? "profile-row-compact" : ""}`}
+          onClick={() => setView("settings")}
+          title={isCollapsed ? currentUser.name : undefined}
+        >
+          <span className="avatar">{currentUser.avatar}</span>
+          {!isCollapsed && (
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <strong>{currentUser.name}</strong>
+              {currentUser.isVerified ? (
+                <span className="verified-tag" style={{ marginTop: 2 }}>
+                  <Check size={9} /> Verified
+                </span>
+              ) : (
+                <span className="unverified-tag" style={{ marginTop: 2 }}>Unverified</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   )
@@ -858,14 +857,14 @@ function HomeView({
           <span>
             <AlertCircle size={20} className="text-amber-500" />
           </span>
-          <div>
+          <div className="status-banner-content">
             <strong>Identity Credential Verification Required</strong>
             <p>
               Please verify your government ID to unlock higher transaction tiers.
               Current withdrawal limit is strictly enforced at <strong>${user.withdrawalLimit.toFixed(2)}</strong>.
             </p>
           </div>
-          <Button variant="secondary" onClick={() => setModal("verify")}>
+          <Button variant="secondary" className="banner-action-btn" onClick={() => setModal("verify")}>
             Verify Now <ArrowRight size={16} />
           </Button>
         </div>
@@ -890,223 +889,184 @@ function HomeView({
 
       {/* DASHBOARD GRID */}
       <div className="dashboard-grid">
-        {/* Total Balance Card */}
-        <div className="balance-card">
-          <div className="balance-top">
-            <div>
-              <span className="eyebrow light">TOTAL AVAILABLE FUNDS (USD)</span>
-              <div className="balance-line">
-                <strong>
-                  {balanceHidden
-                    ? "••••••••"
-                    : `$${user.balanceUSD.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}`}
-                </strong>
-                <Button
-                  variant="icon"
-                  className="dark-icon"
-                  onClick={() => setBalanceHidden(!balanceHidden)}
-                  aria-label={balanceHidden ? "Show balance" : "Hide balance"}
-                >
-                  {balanceHidden ? <Eye size={18} /> : <EyeOff size={18} />}
-                </Button>
+        {/* Left column: balance hero + recent activity */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          {/* Balance Hero Card */}
+          <div className="balance-card">
+            <div className="balance-top">
+              <div>
+                <span className="eyebrow light">TOTAL AVAILABLE BALANCE</span>
+                <div className="balance-line">
+                  <strong>
+                    {balanceHidden
+                      ? "$••••••"
+                      : `$${user.balanceUSD.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`}
+                  </strong>
+                  <Button
+                    variant="icon"
+                    className="dark-icon"
+                    onClick={() => setBalanceHidden(!balanceHidden)}
+                    aria-label={balanceHidden ? "Show balance" : "Hide balance"}
+                  >
+                    {balanceHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+                  </Button>
+                </div>
+                <div className="balance-credentials-row">
+                  <span>Acct: {user.accountNumber}</span>
+                  <span>&bull;</span>
+                  <span>Routing: {user.routingNumber}</span>
+                </div>
               </div>
-              <div className="balance-credentials-row">
-                <span>Account: {user.accountNumber}</span>
-                <span>&bull;</span>
-                <span>Routing: {user.routingNumber}</span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
+                <span className="currency-pill">USD</span>
+                <div className="client-limit-tag">$50 Limit Active</div>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              <span className="currency-pill">
-                USD &bull; United States Dollar
-              </span>
-              <div className="client-limit-tag">
-                $50 Client Withdrawal Limit Active
-              </div>
+
+            <div className="balance-actions">
+              <button className="balance-action" onClick={() => setModal("deposit")}>
+                <ArrowDownLeft size={16} /> Add Funds
+              </button>
+              <button className="balance-action" onClick={() => setView("transfer")}>
+                <Send size={16} /> Transfer
+              </button>
+              <button className="balance-action" onClick={() => setModal("withdraw")}>
+                <ArrowUpRight size={16} /> Withdraw
+              </button>
             </div>
+
+            <div className="balance-orbit orbit-one" />
+            <div className="balance-orbit orbit-two" />
           </div>
 
-          <div className="balance-actions">
-            <Button
-              className="balance-action"
-              onClick={() => setModal("deposit")}
-            >
-              <ArrowDownLeft size={18} /> Deposit Funds
-            </Button>
-            <Button
-              className="balance-action"
-              onClick={() => setView("transfer")}
-            >
-              <Send size={18} /> Transfer to Bank
-            </Button>
-            <Button
-              className="balance-action"
-              onClick={() => setModal("withdraw")}
-            >
-              <ArrowUpRight size={18} /> Withdraw ($50 max)
-            </Button>
-          </div>
-
-          <div className="balance-orbit orbit-one" />
-          <div className="balance-orbit orbit-two" />
+          {/* Recent Transactions */}
+          <Panel>
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow">RECENT ACTIVITY</span>
+                <h2>Transactions</h2>
+              </div>
+              <Button variant="ghost" onClick={() => setView("activity")}>
+                View all <ArrowRight size={15} />
+              </Button>
+            </div>
+            {transactions.length === 0 ? (
+              <div className="empty-state">
+                <Clock3 size={22} className="text-blue-500" />
+                <strong>No transactions yet</strong>
+                <p>Deposits and transfers appear here in real-time.</p>
+              </div>
+            ) : (
+              <div className="transactions-list">
+                {transactions.slice(0, 6).map((tx) => (
+                  <div key={tx.id} className="tx-row">
+                    <div className={`tx-icon tx-icon-${tx.type}`}>
+                      {tx.type === "deposit" ? (
+                        <ArrowDownLeft size={16} />
+                      ) : tx.type === "transfer_out" || tx.type === "withdrawal" ? (
+                        <ArrowUpRight size={16} />
+                      ) : (
+                        <CreditCard size={16} />
+                      )}
+                    </div>
+                    <div className="tx-details">
+                      <strong>{tx.title}</strong>
+                      <span>{tx.description}</span>
+                    </div>
+                    <div className="tx-amount-col">
+                      <strong
+                        className={
+                          tx.type === "deposit" || tx.type === "transfer_in"
+                            ? "tx-positive"
+                            : "tx-negative"
+                        }
+                      >
+                        {tx.type === "deposit" || tx.type === "transfer_in" ? "+" : "-"}
+                        ${tx.amount.toFixed(2)}
+                      </strong>
+                      <small>{tx.timestamp}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
         </div>
 
-        {/* Currency Wallets Panel */}
-        <Panel className="wallet-panel">
-          <div className="panel-heading">
-            <div>
-              <span className="eyebrow">YOUR MULTI-CURRENCY VAULTS</span>
-              <h2>Global Balances</h2>
+        {/* Right column: wallets + FX converter */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          {/* Multi-Currency Wallets */}
+          <Panel>
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow">MULTI-CURRENCY</span>
+                <h2>Global Balances</h2>
+              </div>
+              <Button variant="ghost" onClick={() => setView("wallet")}>
+                All <ArrowRight size={14} />
+              </Button>
             </div>
-            <Button variant="ghost" onClick={() => setView("wallet")}>
-              View All <ArrowRight size={15} />
-            </Button>
-          </div>
-          <div className="currency-list">
-            <div className="currency-item">
-              <div className="currency-flag">🇺🇸</div>
-              <div className="currency-info">
-                <strong>USD &bull; US Dollar</strong>
-                <small>Primary Clearing Account</small>
-              </div>
-              <div className="currency-amount">
-                ${user.balanceUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </div>
-            </div>
-
-            <div className="currency-item">
-              <div className="currency-flag">🇪🇺</div>
-              <div className="currency-info">
-                <strong>EUR &bull; Euro</strong>
-                <small>SEPA Direct Wire Vault</small>
-              </div>
-              <div className="currency-amount">
-                €{user.balanceEUR.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </div>
-            </div>
-
-            <div className="currency-item">
-              <div className="currency-flag">🇬🇧</div>
-              <div className="currency-info">
-                <strong>GBP &bull; British Pound</strong>
-                <small>FPS Faster Payments</small>
-              </div>
-              <div className="currency-amount">
-                £{user.balanceGBP.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </div>
-            </div>
-
-            <div className="currency-item">
-              <div className="currency-flag">🇳🇬</div>
-              <div className="currency-info">
-                <strong>NGN &bull; Nigerian Naira</strong>
-                <small>NIBSS Instant Settlement</small>
-              </div>
-              <div className="currency-amount">
-                ₦{user.balanceNGN.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </div>
-            </div>
-          </div>
-        </Panel>
-
-        {/* Recent Activity Panel */}
-        <Panel className="activity-panel">
-          <div className="panel-heading">
-            <div>
-              <span className="eyebrow">RECENT ACTIVITY</span>
-              <h2>Transactions &amp; Transfers</h2>
-            </div>
-            <Button variant="ghost" onClick={() => setView("activity")}>
-              View all <ArrowRight size={16} />
-            </Button>
-          </div>
-          {transactions.length === 0 ? (
-            <div className="empty-state">
-              <Clock3 size={24} className="text-blue-500" />
-              <strong>No transactions recorded</strong>
-              <p>Deposits and outbound bank transfers will appear here in real-time.</p>
-            </div>
-          ) : (
-            <div className="transactions-list">
-              {transactions.slice(0, 5).map((tx) => (
-                <div key={tx.id} className="tx-row">
-                  <div className={`tx-icon tx-icon-${tx.type}`}>
-                    {tx.type === "deposit" ? (
-                      <ArrowDownLeft size={18} />
-                    ) : tx.type === "transfer_out" || tx.type === "withdrawal" ? (
-                      <ArrowUpRight size={18} />
-                    ) : (
-                      <CreditCard size={18} />
-                    )}
-                  </div>
-                  <div className="tx-details">
-                    <strong>{tx.title}</strong>
-                    <span>{tx.description}</span>
-                  </div>
-                  <div className="tx-amount-col">
-                    <strong
-                      className={
-                        tx.type === "deposit" || tx.type === "transfer_in"
-                          ? "tx-positive"
-                          : "tx-negative"
-                      }
-                    >
-                      {tx.type === "deposit" || tx.type === "transfer_in" ? "+" : "-"}
-                      ${tx.amount.toFixed(2)}
-                    </strong>
-                    <small>{tx.timestamp}</small>
-                  </div>
+            <div className="currency-list">
+              <div className="currency-item">
+                <div className="currency-flag">🇺🇸</div>
+                <div className="currency-info">
+                  <strong>USD</strong>
+                  <small>US Dollar</small>
                 </div>
-              ))}
+                <div className="currency-amount">
+                  ${user.balanceUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+              <div className="currency-item">
+                <div className="currency-flag">🇪🇺</div>
+                <div className="currency-info">
+                  <strong>EUR</strong>
+                  <small>Euro · SEPA</small>
+                </div>
+                <div className="currency-amount">
+                  €{user.balanceEUR.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+              <div className="currency-item">
+                <div className="currency-flag">🇬🇧</div>
+                <div className="currency-info">
+                  <strong>GBP</strong>
+                  <small>British Pound</small>
+                </div>
+                <div className="currency-amount">
+                  £{user.balanceGBP.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+              <div className="currency-item">
+                <div className="currency-flag">🇳🇬</div>
+                <div className="currency-info">
+                  <strong>NGN</strong>
+                  <small>Nigerian Naira</small>
+                </div>
+                <div className="currency-amount">
+                  ₦{user.balanceNGN.toLocaleString("en-US", { minimumFractionDigits: 0 })}
+                </div>
+              </div>
             </div>
-          )}
-        </Panel>
+          </Panel>
 
-        {/* Live Currency Calculator */}
-        <Panel className="fx-panel">
-          <div className="panel-heading">
-            <div>
-              <span className="eyebrow">LIVE INTERBANK RATES</span>
-              <h2>FX Converter</h2>
+          {/* FX Rate Calculator */}
+          <Panel>
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow">LIVE RATES</span>
+                <h2>FX Converter</h2>
+              </div>
+              <span className="live-dot">
+                <i style={{ background: "#10b981" }} /> Live
+              </span>
             </div>
-            <span className="live-dot">
-              <i style={{ background: "#10b981" }} /> Live Interbank Feed
-            </span>
-          </div>
-          <LiveConverter user={user} showToast={showToast} />
-        </Panel>
-
-        {/* Virtual Card Panel */}
-        <Panel className="card-panel">
-          <div className="panel-heading">
-            <div>
-              <span className="eyebrow">SECURE PAYMENT CARD</span>
-              <h2>Wikosafetybank Platinum</h2>
-            </div>
-            <Button variant="icon" onClick={() => setView("cards")}>
-              <MoreHorizontal size={19} />
-            </Button>
-          </div>
-          {card ? (
-            <BankCardComponent card={card} />
-          ) : (
-            <div className="empty-state">
-              <CreditCard size={24} />
-              <p>No active card issued.</p>
-            </div>
-          )}
-          <div className="card-controls">
-            <span>
-              <ShieldCheck size={17} /> EMV 3D-Secure 2.0
-            </span>
-            <span>
-              <LockKeyhole size={17} /> FDIC Insured Provider
-            </span>
-          </div>
-        </Panel>
+            <LiveConverter user={user} showToast={showToast} />
+          </Panel>
+        </div>
       </div>
     </>
   )
@@ -1119,6 +1079,7 @@ function HomeView({
 function TransferView({
   user,
   onTransfer,
+  showToast,
 }: {
   user: UserProfile
   onTransfer: (data: {
@@ -1129,6 +1090,7 @@ function TransferView({
     amount: number
     note: string
   }) => boolean
+  showToast?: (m: string) => void
 }) {
   const [selectedBank, setSelectedBank] = useState(POPULAR_BANKS[0].name)
   const [customBank, setCustomBank] = useState("")
@@ -1154,7 +1116,8 @@ function TransferView({
 
   const handleValidateAccount = () => {
     if (!accountNumber || accountNumber.length < 8) {
-      alert("Please enter a valid 8-12 digit bank account number.")
+      if (showToast) showToast("Please enter a valid 8-12 digit bank account number.")
+      else alert("Please enter a valid 8-12 digit bank account number.")
       return
     }
     setIsVerifying(true)
@@ -1167,7 +1130,8 @@ function TransferView({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!accountNumber || !routingNumber || numAmount <= 0) {
-      alert("Please fill in all recipient bank and transfer details.")
+      if (showToast) showToast("Please fill in all recipient bank and transfer details.")
+      else alert("Please fill in all recipient bank and transfer details.")
       return
     }
 
@@ -1608,10 +1572,12 @@ function CardsView({
   cards,
   user,
   onToggleFreeze,
+  showToast,
 }: {
   cards: BankCard[]
   user: UserProfile
   onToggleFreeze: (id: string) => void
+  showToast?: (m: string) => void
 }) {
   const [showDetails, setShowDetails] = useState(false)
   const card = cards[0]
@@ -1648,7 +1614,11 @@ function CardsView({
               className="flex-1"
               onClick={() => {
                 navigator.clipboard.writeText(card.cardNumber.replace(/\s+/g, ""))
-                alert("Card Number copied to clipboard!")
+                if (showToast) {
+                  showToast("Card number copied to clipboard!")
+                } else {
+                  alert("Card Number copied to clipboard!")
+                }
               }}
             >
               <Copy size={16} /> Copy PAN
@@ -1707,9 +1677,11 @@ function CardsView({
 function ActivityView({
   transactions,
   onSelectTx,
+  showToast,
 }: {
   transactions: Transaction[]
   onSelectTx: (tx: Transaction) => void
+  showToast?: (m: string) => void
 }) {
   const [filter, setFilter] = useState<string>("all")
   const [search, setSearch] = useState<string>("")
@@ -1738,7 +1710,11 @@ function ActivityView({
         <Button
           variant="secondary"
           onClick={() => {
-            alert("Downloading Official Bank Statement (PDF simulation)...")
+            if (showToast) {
+              showToast("Official Bank Statement (PDF) downloaded successfully.")
+            } else {
+              alert("Downloading Official Bank Statement (PDF simulation)...")
+            }
           }}
         >
           <Download size={16} /> Download Statement
@@ -2153,7 +2129,7 @@ function AdminPortalView({
   const handleCreditFunds = () => {
     const amt = parseFloat(creditAmount)
     if (!amt || amt <= 0) {
-      alert("Please enter a valid credit amount.")
+      showToast("Please enter a valid credit amount.")
       return
     }
 
@@ -2189,7 +2165,7 @@ function AdminPortalView({
   const handleUpdateLimit = () => {
     const limit = parseFloat(newLimit)
     if (isNaN(limit) || limit < 0) {
-      alert("Please enter a valid limit amount.")
+      showToast("Please enter a valid limit amount.")
       return
     }
 
