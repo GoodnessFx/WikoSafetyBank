@@ -271,8 +271,6 @@ export default function App() {
         <Header
           currentUser={currentUser}
           isAdmin={isAdminAuthenticated}
-          isSidebarCollapsed={isSidebarCollapsed}
-          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           onMenu={() => setMobileMenu(true)}
           onAdminClick={() => {
             if (isAdminAuthenticated) {
@@ -714,16 +712,12 @@ function Sidebar({
 function Header({
   currentUser,
   isAdmin,
-  isSidebarCollapsed,
-  onToggleSidebar,
   onMenu,
   onAdminClick,
   onVerificationClick,
 }: {
   currentUser: UserProfile
   isAdmin: boolean
-  isSidebarCollapsed: boolean
-  onToggleSidebar: () => void
   onMenu: () => void
   onAdminClick: () => void
   onVerificationClick: () => void
@@ -731,13 +725,6 @@ function Header({
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <button
-          className="desktop-sidebar-toggle"
-          onClick={onToggleSidebar}
-          title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {isSidebarCollapsed ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}
-        </button>
         <div className="mobile-brand">
           <Brand onAdminClick={onAdminClick} />
         </div>
@@ -1188,7 +1175,7 @@ function TransferView({
           <form onSubmit={handleSubmit}>
             {/* Source Account Info */}
             <div className="form-group mb-4">
-              <label>FROM CLIENT ACCOUNT</label>
+              <label>From Client Account</label>
               <div className="source-account-box">
                 <Landmark size={20} className="text-blue-500" />
                 <div className="flex-1">
@@ -1201,7 +1188,7 @@ function TransferView({
 
             {/* Select Destination Real Bank */}
             <div className="form-group">
-              <label>DESTINATION BANK</label>
+              <label>Destination Bank</label>
               <select
                 value={selectedBank}
                 onChange={(e) => handleBankSelect(e.target.value)}
@@ -1218,7 +1205,7 @@ function TransferView({
 
             {selectedBank === "Other" && (
               <div className="form-group">
-                <label>ENTER BANK NAME</label>
+                <label>Bank Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Deutsche Bank, Morgan Stanley"
@@ -1232,7 +1219,7 @@ function TransferView({
 
             <div className="form-row">
               <div className="form-group flex-1">
-                <label>RECIPIENT FULL NAME</label>
+                <label>Recipient Full Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Johnathan Miller / Corp Inc"
@@ -1243,7 +1230,7 @@ function TransferView({
                 />
               </div>
               <div className="form-group flex-1">
-                <label>ROUTING NUMBER (ABA / SORT CODE)</label>
+                <label>Routing Number (ABA / Sort Code)</label>
                 <input
                   type="text"
                   placeholder="9-digit routing"
@@ -1256,12 +1243,12 @@ function TransferView({
             </div>
 
             <div className="form-group">
-              <label>RECIPIENT ACCOUNT NUMBER / IBAN</label>
+              <label>Recipient Account Number / IBAN</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   placeholder="Enter 10-12 digit real bank account number"
-                  className="input-text flex-1"
+                  className="input-text flex-1 font-mono"
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
                   required
@@ -1286,7 +1273,7 @@ function TransferView({
             {/* Transfer Amount */}
             <div className="form-group">
               <div className="flex justify-between items-center mb-1">
-                <label>TRANSFER AMOUNT (USD)</label>
+                <label>Transfer Amount (USD)</label>
                 <span className="text-xs text-muted">
                   Max allowed: <strong>${user.withdrawalLimit.toFixed(2)}</strong>
                 </span>
@@ -1332,7 +1319,7 @@ function TransferView({
 
             {/* Transfer Rail */}
             <div className="form-group">
-              <label>SETTLEMENT SPEED</label>
+              <label>Settlement Speed</label>
               <div className="transfer-rails">
                 <div
                   className={`rail-card ${transferType === "instant" ? "active" : ""}`}
@@ -1358,7 +1345,7 @@ function TransferView({
             </div>
 
             <div className="form-group">
-              <label>PAYMENT MEMO / REFERENCE</label>
+              <label>Payment Memo / Reference</label>
               <input
                 type="text"
                 value={note}
@@ -1864,7 +1851,7 @@ function SettingsView({
     <div className="settings-view">
       <div className="welcome-row">
         <div>
-          <span className="date-label">PREFERENCES &amp; SECURITY</span>
+          <span className="date-label">Preferences &amp; Security</span>
           <h1>Bank Profile &amp; Credentials</h1>
           <p>Manage your legal client information, assigned account number, and security safeguards.</p>
         </div>
@@ -1873,29 +1860,29 @@ function SettingsView({
       <div className="settings-grid">
         {/* Assigned Bank Coordinates Box */}
         <Panel className="assigned-account-panel">
-          <div className="flex items-center justify-between mb-3">
+          <div className="panel-heading">
             <h3 className="flex items-center gap-2">
-              <Landmark size={20} className="text-blue-500" />
+              <Landmark size={18} className="text-blue-600" />
               <span>Assigned Bank Coordinates</span>
             </h3>
             <span className="badge-primary">Official Wire</span>
           </div>
           <div className="coordinates-grid">
             <div className="coordinate-item">
-              <span>FINANCIAL INSTITUTION</span>
+              <span>Financial Institution</span>
               <strong>{user.bankName}</strong>
             </div>
             <div className="coordinate-item">
-              <span>CLIENT ACCOUNT NUMBER</span>
-              <strong className="text-blue-600">{user.accountNumber}</strong>
+              <span>Client Account Number</span>
+              <strong className="text-blue-600 font-mono">{user.accountNumber}</strong>
             </div>
             <div className="coordinate-item">
-              <span>ROUTING NUMBER (ABA)</span>
-              <strong>{user.routingNumber}</strong>
+              <span>Routing Number (ABA)</span>
+              <strong className="font-mono">{user.routingNumber}</strong>
             </div>
             <div className="coordinate-item">
-              <span>SWIFT / BIC CODE</span>
-              <strong>{user.swiftBic}</strong>
+              <span>SWIFT / BIC Code</span>
+              <strong className="font-mono">{user.swiftBic}</strong>
             </div>
           </div>
           <p className="text-xs text-muted mt-3">
@@ -1905,14 +1892,14 @@ function SettingsView({
 
         {/* Identity & Credentials Verification Panel */}
         <Panel className="kyc-panel">
-          <div className="flex items-center justify-between mb-3">
+          <div className="panel-heading">
             <h3 className="flex items-center gap-2">
-              <ShieldCheck size={20} className="text-emerald-500" />
+              <ShieldCheck size={18} className="text-emerald-600" />
               <span>Identity &amp; Credential Verification</span>
             </h3>
             {user.isVerified ? (
               <span className="verified-tag">
-                <Check size={12} /> Verified Level 2
+                <Check size={11} /> Verified Level 2
               </span>
             ) : (
               <span className="unverified-tag">Unverified</span>
@@ -1923,9 +1910,9 @@ function SettingsView({
           </p>
 
           <div className="kyc-status-box">
-            <div>
+            <div className="kyc-status-info">
               <strong>Document: {user.idDocumentType || "None submitted"}</strong>
-              <small>Number: {user.idDocumentNumber || "Pending verification"}</small>
+              <small className="font-mono">Number: {user.idDocumentNumber || "Pending verification"}</small>
             </div>
             <Button
               variant={user.isVerified ? "secondary" : "primary"}
@@ -1938,35 +1925,40 @@ function SettingsView({
 
         {/* Withdrawal Safeguard & Limits */}
         <Panel className="withdrawal-safeguard-panel">
-          <h3 className="flex items-center gap-2 mb-2">
-            <ShieldAlert size={20} className="text-amber-500" />
-            <span>Client Withdrawal Limit Safeguard</span>
-          </h3>
+          <div className="panel-heading">
+            <h3 className="flex items-center gap-2">
+              <ShieldAlert size={18} className="text-amber-500" />
+              <span>Client Withdrawal Limit Safeguard</span>
+            </h3>
+          </div>
           <p className="text-sm text-muted mb-3">
             In compliance with client protection protocols, individual withdrawals and outbound transfers are capped:
           </p>
           <div className="limit-meter-card">
             <div className="flex justify-between items-center">
               <div>
-                <span className="text-xs text-muted block">CURRENT WITHDRAWAL CAP</span>
-                <strong className="text-2xl text-navy">${user.withdrawalLimit.toFixed(2)} USD</strong>
+                <span className="text-xs text-muted block mb-1">Current Withdrawal Cap</span>
+                <strong className="text-2xl text-navy font-bold">${user.withdrawalLimit.toFixed(2)} USD</strong>
               </div>
               <Button variant="ghost" onClick={onOpenAdmin}>
                 <KeyRound size={16} /> Admin Override
               </Button>
             </div>
-            <small className="text-xs text-amber-700 block mt-2 bg-amber-50 p-2 rounded border border-amber-200">
-              * Note: To increase this limit above $50.00, log into the Hidden Admin Portal using master credentials.
-            </small>
+            <div className="limit-alert-note mt-3">
+              <AlertCircle size={14} className="text-amber-600 flex-shrink-0" />
+              <span>To increase this limit above $50.00, authenticate into the Hidden Admin Portal using master credentials.</span>
+            </div>
           </div>
         </Panel>
 
         {/* Profile Info Form */}
         <Panel className="profile-form-panel">
-          <h3 className="mb-3">Client Personal Information</h3>
+          <div className="panel-heading">
+            <h3>Client Personal Information</h3>
+          </div>
           <form onSubmit={handleSaveProfile}>
             <div className="form-group mb-3">
-              <label>FULL LEGAL NAME</label>
+              <label>Full Legal Name</label>
               <input
                 type="text"
                 value={name}
@@ -1976,7 +1968,7 @@ function SettingsView({
               />
             </div>
             <div className="form-group mb-3">
-              <label>EMAIL ADDRESS</label>
+              <label>Email Address</label>
               <input
                 type="email"
                 value={email}
@@ -1986,7 +1978,7 @@ function SettingsView({
               />
             </div>
             <div className="form-group mb-4">
-              <label>PHONE NUMBER</label>
+              <label>Phone Number</label>
               <input
                 type="text"
                 value={phone}
@@ -2505,7 +2497,7 @@ function AdminPortalView({
             </div>
             <form onSubmit={handleCreateClient} className="mt-4">
               <div className="form-group mb-3">
-                <label>FULL CLIENT NAME</label>
+                <label>Full Client Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Richard Hendricks"
@@ -2516,7 +2508,7 @@ function AdminPortalView({
                 />
               </div>
               <div className="form-group mb-3">
-                <label>CLIENT EMAIL</label>
+                <label>Client Email Address</label>
                 <input
                   type="email"
                   placeholder="e.g. richard@piedpiper.com"
@@ -2527,7 +2519,7 @@ function AdminPortalView({
                 />
               </div>
               <div className="form-group mb-4">
-                <label>PHONE</label>
+                <label>Phone Number</label>
                 <input
                   type="text"
                   placeholder="+1 (555) 000-0000"
@@ -2785,7 +2777,7 @@ function DepositModal({
           <form onSubmit={handleDepositSubmit}>
             <div className="form-group mb-3">
               <div className="flex justify-between items-center mb-1">
-                <label>AMOUNT TO DEPOSIT (USD)</label>
+                <label>Amount to Deposit (USD)</label>
                 <div className="flex gap-1">
                   {["100", "250", "500", "1000"].map((v) => (
                     <button
@@ -2814,26 +2806,26 @@ function DepositModal({
             </div>
 
             <div className="form-group mb-3">
-              <label>CARD NUMBER</label>
+              <label>Card Number</label>
               <input
                 type="text"
                 placeholder="4532 •••• •••• 9281"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value)}
-                className="input-text"
+                className="input-text font-mono"
                 required
               />
             </div>
 
             <div className="form-row flex gap-3 mb-3">
               <div className="form-group flex-1">
-                <label>EXPIRY (MM/YY)</label>
+                <label>Expiry (MM/YY)</label>
                 <input
                   type="text"
                   placeholder="08/29"
                   value={cardExpiry}
                   onChange={(e) => setCardExpiry(e.target.value)}
-                  className="input-text"
+                  className="input-text font-mono"
                   required
                 />
               </div>
@@ -2845,14 +2837,14 @@ function DepositModal({
                   placeholder="•••"
                   value={cardCvv}
                   onChange={(e) => setCardCvv(e.target.value)}
-                  className="input-text"
+                  className="input-text font-mono"
                   required
                 />
               </div>
             </div>
 
             <div className="form-group mb-4">
-              <label>CARDHOLDER NAME</label>
+              <label>Cardholder Name</label>
               <input
                 type="text"
                 value={cardHolder}
@@ -2958,7 +2950,7 @@ function DepositModal({
         {activeTab === "instant" && (
           <form onSubmit={handleDepositSubmit}>
             <div className="form-group mb-4">
-              <label>INSTANT TOP-UP AMOUNT (USD)</label>
+              <label>Instant Top-Up Amount (USD)</label>
               <div className="amount-input-box">
                 <span className="currency-symbol">$</span>
                 <input
@@ -3034,7 +3026,7 @@ function WithdrawModal({
         </div>
 
         <div className="form-group my-3">
-          <label>DESTINATION CHANNEL</label>
+          <label>Destination Channel</label>
           <select
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
@@ -3048,7 +3040,7 @@ function WithdrawModal({
         </div>
 
         <div className="form-group mb-4">
-          <label>AMOUNT (USD - MAX $50)</label>
+          <label>Amount (USD - Max $50)</label>
           <div className="amount-input-box">
             <span className="currency-symbol">$</span>
             <input
@@ -3132,7 +3124,7 @@ function VerificationModal({
         {verifiedStep === 1 ? (
           <form onSubmit={handleVerify} className="mt-4">
             <div className="form-group mb-3">
-              <label>DOCUMENT TYPE</label>
+              <label>Document Type</label>
               <select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
@@ -3146,13 +3138,13 @@ function VerificationModal({
             </div>
 
             <div className="form-group mb-3">
-              <label>DOCUMENT NUMBER</label>
+              <label>Document Identifier Number</label>
               <input
                 type="text"
                 placeholder="e.g. P98124018A or DL-882910"
                 value={docNumber}
                 onChange={(e) => setDocNumber(e.target.value)}
-                className="input-text"
+                className="input-text font-mono"
                 required
               />
             </div>
@@ -3231,7 +3223,7 @@ function AdminLoginModal({
 
         <form onSubmit={handleSubmit} className="mt-4">
           <div className="form-group mb-4">
-            <label>ADMINISTRATOR ACCESS KEY</label>
+            <label>Administrator Access Key</label>
             <div className="relative flex items-center">
               <input
                 type={showPass ? "text" : "password"}
