@@ -626,7 +626,8 @@ export default function App() {
             </form>
           </div>
         </div>
-       {/* Order Confirmation Modal */}
+       )}
+{/* Order Confirmation Modal */}
       {modal === "orderConfirmation" && currentOrder && (
         <div className="modal-backdrop" onMouseDown={() => setModal(null)}>
           <div className="modal" onMouseDown={e => e.stopPropagation()}>
@@ -650,8 +651,8 @@ export default function App() {
         </div>
       )}
      )}
-    </div>
-  )
+
+
 }
 
 /* =========================================================================
