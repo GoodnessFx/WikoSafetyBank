@@ -71,7 +71,7 @@ import {
 } from "./bankData"
 
 type View = "home" | "transfer" | "wallet" | "cards" | "activity" | "settings" | "support" | "admin"
-type ModalType = "deposit" | "withdraw" | "transfer" | "verify" | "adminLogin" | "receipt" | "requestCard" | null
+type ModalType = "deposit" | "withdraw" | "transfer" | "verify" | "adminLogin" | "receipt" | "requestCard" | "orderConfirmation" | null
 
 function Button({
   children,
@@ -156,7 +156,8 @@ export default function App() {
   const [cardOrders, setCardOrders] = useState<CardOrder[]>(() => {
     const saved = localStorage.getItem("wiko_card_orders")
     return saved ? JSON.parse(saved) : []
-  })
+  });
+  const [currentOrder, setCurrentOrder] = useState<CardOrder | null>(null);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return localStorage.getItem("wiko_sidebar_collapsed") === "true"
@@ -606,9 +607,8 @@ export default function App() {
                 status: "Ordered",
               };
               setCardOrders(prev => [...prev, newOrder]);
-              setModal(null);
-              showToast("Card order placed! Redirecting to shipping...");
-              window.open("https://wikoshipping.com", "_blank");
+              setCurrentOrder(newOrder);
+              setModal("orderConfirmation");
             }}>
               <div className="form-group mb-3">
                 <label>Full Name</label>
@@ -626,7 +626,30 @@ export default function App() {
             </form>
           </div>
         </div>
+       {/* Order Confirmation Modal */}
+      {modal === "orderConfirmation" && currentOrder && (
+        <div className="modal-backdrop" onMouseDown={() => setModal(null)}>
+          <div className="modal" onMouseDown={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <div className="modal-icon text-green-600"><Check size={22} /></div>
+              <Button variant="icon" onClick={() => setModal(null)}><X size={18} /></Button>
+            </div>
+            <h2>Card Order Confirmation</h2>
+            <p>Your order has been recorded.</p>
+            <ul className="list-disc pl-5">
+              <li><strong>Name:</strong> {currentOrder.fullName}</li>
+              <li><strong>Address:</strong> {currentOrder.address}</li>
+              <li><strong>Phone:</strong> {currentOrder.phone}</li>
+            </ul>
+            <Button className="full mt-3" onClick={() => {
+              showToast("Redirecting to shipping partner...");
+              window.open("https://wikoshipping.com", "_blank");
+              setModal(null);
+            }}>Proceed to Shipping</Button>
+          </div>
+        </div>
       )}
+     )}
     </div>
   )
 }
